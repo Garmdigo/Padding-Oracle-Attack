@@ -1,11 +1,24 @@
+
 import socket
+import binascii
+def GetInfo(Cipher):
+    C = Cipher.split("\\n")[1].split("\\n")
+    iv =   Cipher.split("IV")[1].split("'")
+    CipherText = C[0].replace(" ","")
+    IV = iv[1].replace("'","")
+    return CipherText,IV
+def Hex2Bytes(Bytes):
+    return(bytes.fromhex(Bytes))
 
 r = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 r.connect(("128.186.120.191", 31337))
 
 r.send("-e".encode())     # Encryption of the secret message
 x = r.recv(1024).decode()
-print x
+CTX,IV = GetInfo(x)
+print Hex2Bytes(CTX)
+print Hex2Bytes(IV)
+
 
 
 
