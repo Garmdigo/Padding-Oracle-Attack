@@ -9,6 +9,17 @@ def GetInfo(Cipher):
     IV = iv[1].replace("'","")
     return CipherText,IV
 
+def xor(arg1,arg2):
+    byte1 = bytes(arg1)
+    byte2 = bytes(arg2)
+    print(byte1)
+    print("asda")
+    print(byte2)
+    return bytes(a ^ b for a, b in zip(byte1, byte2))
+
+
+
+
 
 r = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 r.connect(("128.186.120.191", 31337))
@@ -21,12 +32,16 @@ r.connect(("128.186.120.191", 31337))
 r.send("-e".encode())     # Encryption of the secret message
 x = r.recv(1024).decode()
 Ciphertext, IV = GetInfo(x)
+print(Ciphertext)
+print(IV)
 CTencode = bytearray(Ciphertext, 'utf-8')
 IVencode = bytearray(IV, 'utf-8')
 print(x)
 print(CTencode)
 print(IV)
 print(len(CTencode)/2)
+print("Xor")
+print(xor(CTencode,IVencode))
 print(type(x))
 print(type(CTencode))
 print(type(IVencode))
