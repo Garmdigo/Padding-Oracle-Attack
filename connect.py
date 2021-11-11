@@ -13,6 +13,16 @@ def GetInfo(Cipher):
 def xor(arg1,arg2):
     return hexlify(''.join(chr(ord(arg1) ^ ord(arg2)) for arg1, arg2 in zip(unhexlify(arg1), cycle(unhexlify(arg2)))))
 
+def requestServer(prefix):
+    r.send(("-e " + str(prefix)).encode())     # Encryption of the secret message
+    x = r.recv(1024).decode()
+    return x
+def checkValidate(prefix):
+    r.send(("-v " + str(prefix)).encode())     # Encryption of the secret message
+    x = r.recv(1024).decode()
+    return x
+
+
 
 
 
@@ -27,7 +37,7 @@ r.connect(("128.186.120.191", 31337))
 
 r.send("-e".encode())     # Encryption of the secret message
 x = r.recv(1024).decode()
-r.send("00000000-e".encode())     # Encryption of the secret message
+r.send("-e 00000000" .encode())     # Encryption of the secret message
 
 Ciphertext, IV = GetInfo(x)
 print(Ciphertext)
