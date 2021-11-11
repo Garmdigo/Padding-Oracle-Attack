@@ -1,5 +1,6 @@
 import socket
-import binascii
+from binascii import unhexlify, hexlify
+from itertools import cycle
 import base64
 
 def GetInfo(Cipher):
@@ -10,12 +11,7 @@ def GetInfo(Cipher):
     return CipherText,IV
 
 def xor(arg1,arg2):
-    byte1 = bytes(arg1)
-    byte2 = bytes(arg2)
-    print(byte1)
-    print("asda")
-    print(byte2)
-    return bytes(a ^ b for a, b in zip(byte1, byte2))
+    return hexlify(''.join(chr(ord(arg1) ^ ord(arg2)) for arg1, arg2 in zip(unhexlify(arg1), cycle(unhexlify(arg2)))))
 
 
 
@@ -31,6 +27,8 @@ r.connect(("128.186.120.191", 31337))
 
 r.send("-e".encode())     # Encryption of the secret message
 x = r.recv(1024).decode()
+r.send("00000000-e".encode())     # Encryption of the secret message
+
 Ciphertext, IV = GetInfo(x)
 print(Ciphertext)
 print(IV)
@@ -41,7 +39,7 @@ print(CTencode)
 print(IV)
 print(len(CTencode)/2)
 print("Xor")
-print(xor(CTencode,IVencode))
+print(xor(Ciphertext,Ciphertext))
 print(type(x))
 print(type(CTencode))
 print(type(IVencode))
