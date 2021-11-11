@@ -21,6 +21,21 @@ def splitBlocks(message):
     print Slices
     return Slices
 
+def sliceBlocks(message):
+    size = len(message)
+    slices = []
+    x = 0
+    y = 32
+    v = size % 32    
+    for i in range(size / 32):
+       slices.append(message[x:y])
+       x += 32
+       y += 32
+    if(v!=0):
+      slices.append(message[x:y])
+
+    return slices
+
 def xor(arg1,arg2):
     return hexlify(''.join(chr(ord(a) ^ ord(b)) for a, b in zip(unhexlify(arg1), unhexlify(arg2))))
 
@@ -53,10 +68,12 @@ Ciphertext, IV = GetInfo(x)
 CTencode = bytes(Ciphertext)
 #CT = bytes(CT2)
 c = xor(Ciphertext, IV)
+d = '8ba32609aa15bea4d686831382c8c33c7ghd7'
+print(len(d) % 32)
 print(IV)
 print(Ciphertext)
 print(c)
-print(splitBlocks('8ba32609aa15bea4d686831382c8c33c7ghd7'))
+print(sliceBlocks('8ba32609aa15bea4d686831382c8c33c7ghd7'))
 
 #r.send("-e abcdef0123456789".encode()) # Encryption of abcdef0123456789 || message
 #x = r.recv(1024).decode()
