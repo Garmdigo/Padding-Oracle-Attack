@@ -2,9 +2,8 @@ import socket
 from binascii import unhexlify, hexlify
 import base64
 from itertools import cycle
-from math import floor
+from math import floor,ceil
 import math
-
 def GetInfo(Cipher):
     C = Cipher.split("\\n")[1].split("\\n")
     iv =   Cipher.split("IV")[1].split("'")
@@ -12,29 +11,35 @@ def GetInfo(Cipher):
     IV = iv[1].replace("'","")
     return CipherText,IV
 
-def splitBlocks(message):
-    Size = len(message)
-    Slices = []
-    Increment =int(Size/32)
-    for i in range(Increment):
-        Slices.append(message[i*32:(i+1)*32])
-    print Slices
-    return Slices
+def HexToUnicode(hex):
+    return codepoints.encode("utf-8")
 
-def sliceBlocks(message):
-    size = len(message)
-    slices = []
-    x = 0
-    y = 32
-    v = size % 32    
-    for i in range(size / 32):
-       slices.append(message[x:y])
-       x += 32
-       y += 32
-    if(v!=0):
-      slices.append(message[x:y])
 
-    return slices
+#def sliceBlocks(message):
+#    size = len(message)
+#    slices = []
+#    x = 0
+#    y = 32
+#    v = size % 32  
+#    if (v):
+#        for i in range(size / 32):
+#           slices.append(message[x:y])
+#           x += 32
+#           y += 32
+#    if(v!=1):
+#        if size != 0 & size < 32: 
+#            tmp = size % 33
+#            LengthNeeded = 33 - tmp
+#            Padding = v.zfill(padding)
+#            slices.append(Padding)
+#        if size > 32:
+#                counter  = size -32
+#                while (counter)
+#               for i in range(ceil(size / 32)):
+#                   slices.append(message[x:y])
+#                   x += 32
+#                   y += 32
+#    return slices
 
 def xor(arg1,arg2):
     return hexlify(''.join(chr(ord(a) ^ ord(b)) for a, b in zip(unhexlify(arg1), unhexlify(arg2))))
@@ -48,6 +53,11 @@ def checkValidate(prefix):
     r.send(("-V " + str(prefix)).encode())     # Encryption of the secret message
     x = r.recv(1024).decode()
     return x
+def getNtoLast(bytes,position):
+    return bytes[-positon]
+def LastNbyte(bytes,getNtoLast,choosebyte):
+    LastBlock = getNtoLast(bytes,getNtoLast)
+    return LastBlock[-choosebyte:]
 
 
 r = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
