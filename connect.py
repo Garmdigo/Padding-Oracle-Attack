@@ -54,6 +54,12 @@ def listToString(input):
        str = str + input[i]
     return str
 
+def getNtoLast(bytes,position):
+    return bytes[-positon]
+def LastNbyte(bytes,getNtoLast,choosebyte):
+    LastBlock = getNtoLast(bytes,getNtoLast)
+    return LastBlock[-choosebyte:]
+
 r = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 r.connect(("128.186.120.191", 31337))
 
