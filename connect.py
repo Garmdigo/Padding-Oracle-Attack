@@ -12,31 +12,67 @@ def GetInfo(Cipher):
     IV = iv[1].replace("'","")
     return CipherText,IV
 
-def splitBlocks(message):
-    Size = len(message)
-    Slices = []
-    Increment =int(Size/32)
-    for i in range(Increment):
-        Slices.append(message[i*32:(i+1)*32])
-    return Slices
+
 
 def sliceBlocks(message):
-    size = len(message)
+    size = len(message) /2
+    Bytes = message
     slices = []
     x = 0
     y = 32
-    v = size % 32    
-    for i in range(size / 32):
-       slices.append(message[x:y])
-       x += 32
-       y += 32
+    v = size % 32
+    if(v):
+        iter = floor(len(message)/32)
+        tmp = []
+        for i in range(iter):
+           slices.append(message[x:y+1])
+           x += 32
+           y += 32
+        slices.append(message[x:].zfill(32))
+        v = 0
+    if (v ==0 ):
+        pass
     if(v!=0):
-      slices.append(message[x:y])
+      run = True 
+      loopcounter = size
+      begposition = 0
+      endPosition = 32
+      while run:
+          if(loopcounter > 32):
 
+              slices.append(message[begposition:endPosition+1])
+
+              begposition +=32
+              endPosition += 32         
+              loopcounter -= 32
+          if (loopcounter < 32):
+                
+                padLength = 32 - loopcounter
+                beforePadding = message[begposition:]
+                slices.append(message.zfill(padLength))
+                print(beforePadding.zfill(padLength))
+                run = False
+                v = 0
     return slices
 
 def xor(arg1,arg2):
-    return hexlify(''.join(chr(ord(a) ^ ord(b)) for a, b in zip(unhexlify(arg1), unhexlify(arg2))))
+    print(arg1,arg2)
+    if( len(arg1) % 2 ==0 & len(arg2) % 2 ==0):
+        return hexlify(''.join(chr(ord(a) ^ ord(b)) for a, b in zip(unhexlify(arg1), cycle(unhexlify(arg2)))))
+    if (len(arg1) %2 !=0  & len(arg2) % 2 != 0):
+        arg1 = unhexlify('0%x' % arg1)
+        arg2 = unhexlify('0%x' % arg2)
+        return hexlify(''.join(chr(ord(a) ^ ord(b)) for a, b in zip(arg1, cycle(arg2))))
+
+    if ( len(arg2) %2 == 0 & len(arg1) %2 != 0):
+        arg1 = unhexlify('0%x' % n)
+        return hexlify(''.join(chr(ord(a) ^ ord(b)) for a, b in zip(arg1, cycle(unhexlify(arg2)))))
+    
+    if ( len(arg1) %2 == 0 & len(arg2) %2 != 0):
+        arg2 = unhexlify('0%x' % n)
+        return hexlify(''.join(chr(ord(a) ^ ord(b)) for a, b in zip(unhexlify(arg1), cycle(arg2))))
+
+  
 
 
 def requestServer(prefix):
@@ -55,10 +91,10 @@ def listToString(input):
     return str
 
 def getNtoLast(bytes,position):
-    return bytes[-positon]
+    return listToString(bytes[-positon])
 def LastNbyte(bytes,getNtoLast,choosebyte):
     LastBlock = getNtoLast(bytes,getNtoLast)
-    return LastBlock[-choosebyte:]
+    return LastBlock[-choosebyte]
 
 r = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 r.connect(("128.186.120.191", 31337))
@@ -76,15 +112,24 @@ x = requestServer('')
 
 Ciphertext, IV = GetInfo(x)
 #CT2, IV2 = GetInfo(y)
-CTencode = bytes(Ciphertext)
+#CTencode = bytes(Ciphertext)
 #CT = bytes(CT2)
-
+print("Ciphertext")
+print(Ciphertext)
+print("IV")
+print(IV)
+print("new line")
 d = sliceBlocks(Ciphertext)
+print(d)
+print("sasd")
+
 b=d[0]
 d[-1]=b
 a= d[-1]
 c = xor(d[0], IV)
-
+print(c)
+print("assdad")
+print(LastNbyte(c,1,1))
 
 str = listToString(d)
 #print(str[0])
