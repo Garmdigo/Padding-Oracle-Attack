@@ -148,56 +148,43 @@ def pleaseWork():
 	CT, I, val = testOracle()
 	s = sliceBlock(CT)
 	messagelen = len(s) -2
-	message = [[]]*messagelen
+	#message = [[]]*messagelen
+	message=[]
+	for i in range(messagelen):
+		message.append([])
 	print(message)
         x1= y1=x = block =result=result2 = y = ""
-	'''
-        if(val == "Valid"):
-                block = returnithBlock(CT, -2)
-                result = xor(IV, block)
-                result2 = xor(result[-2:], '0F')
-                x = CT
-                y = IV
-        else:
-                while(val!="Valid"):
-                        CT, IV, val = testOracle()
-                        if(val == "Valid"):
-                                block = returnithBlock(CT, -2)
-                                result = xor(IV, block)
-                                result2 = xor(result[-2:], '0F')
-				message.insert(31,result2)
-                                x = CT
-                                y = IV
-        print(x)
-        print(y)
-        '''
-        
         for i in range(messagelen):
-                print(i)
 		CT,I, val = oracle(i)
         	if(val == "Valid"):
                 	block = returnithBlock(CT, -2)
+			print(block)
 			bl = I + CT
 			o = sliceBlock(bl)
-                	result = xor(o[i], block)
-                	result2 = xor(result[-2:], '0F')
+               		result = xor(o[i], block)
+               		result2 = xor(result[-2:], '0F')
 			print(result)
                 	x1 = CT
                 	y1 = I
-                        print(result2)
-        	else:
-                	while(val!="Valid"):
-                        	CT, I, val = oracle(i)
-                        	if(val == "Valid"):
-                                	block = returnithBlock(CT, -2)
+                       	print(result2)
+			message[i].append(result2)
+       		else:
+               		while(val!="Valid"):
+                       		CT, I, val = oracle(i)
+                       		if(val == "Valid"):
+                               		block = returnithBlock(CT, -2)	
 					bl = I + CT
 					o = sliceBlock(bl)
-                                	result = xor(o[i], block)
+                               		result = xor(o[i], block)
 					print(result)
-                                	result2 = xor(result[-2:], '0F')
-                                	x1 = CT
-                                	y1 = I
+                               		result2 = xor(result[-2:], '0F')
+                               		x1 = CT
+                               		y1 = I
 					print(result2)
+					message[i].append(result2)
+					
+					
+	print(message)
 		
 
 '''
