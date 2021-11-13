@@ -115,14 +115,14 @@ def testOracle():
 
 
 def oracle(p):
-     t = requestServer("")
-     Ciphertext, IV = GetInfo(t)
-     d = sliceBlock(Ciphertext)
+     t= requestServer("")
+     C, I = GetInfo(t)
+     d = sliceBlock(C)
      b=d[p]
      d[-1]=b
      st = listToString(d)
-     z = checkValidate(str(st), str(IV))
-     return st, IV, z
+     z = checkValidate(str(st), str(I))
+     return st, I, z
 
 
 def prefixTest(C, Cprime):
@@ -145,8 +145,13 @@ def xorTest(val, val2):
 
 
 def pleaseWork():
-	CT, IV, val = testOracle()
-        x = block =result=result2 = y = ""
+	CT, I, val = testOracle()
+	s = sliceBlock(CT)
+	messagelen = len(s) -2
+	message = [[]]*messagelen
+	print(message)
+        x1= y1=x = block =result=result2 = y = ""
+	'''
         if(val == "Valid"):
                 block = returnithBlock(CT, -2)
                 result = xor(IV, block)
@@ -160,33 +165,39 @@ def pleaseWork():
                                 block = returnithBlock(CT, -2)
                                 result = xor(IV, block)
                                 result2 = xor(result[-2:], '0F')
+				message.insert(31,result2)
                                 x = CT
                                 y = IV
         print(x)
         print(y)
-        print(result2)
-        blocks = splitBlocks(x)
-        blockLen = len(blocks)
-        for i in range(blockLen - 2):
-		CT, IV, val = testOracle()
-        	
+        '''
+        
+        for i in range(messagelen):
+                print(i)
+		CT,I, val = oracle(i)
         	if(val == "Valid"):
                 	block = returnithBlock(CT, -2)
-                	result = xor(IV, block)
+			bl = I + CT
+			o = sliceBlock(bl)
+                	result = xor(o[i], block)
                 	result2 = xor(result[-2:], '0F')
-                	x = CT
-                	y = IV
+			print(result)
+                	x1 = CT
+                	y1 = I
+                        print(result2)
         	else:
                 	while(val!="Valid"):
-                        	CT, IV, val = testOracle()
+                        	CT, I, val = oracle(i)
                         	if(val == "Valid"):
                                 	block = returnithBlock(CT, -2)
-                                	result = xor(IV, block)
+					bl = I + CT
+					o = sliceBlock(bl)
+                                	result = xor(o[i], block)
+					print(result)
                                 	result2 = xor(result[-2:], '0F')
-                                	x = CT
-                                	y = IV
-		       
-		
+                                	x1 = CT
+                                	y1 = I
+					print(result2)
 		
 
 '''
@@ -249,6 +260,9 @@ r.connect(("128.186.120.191", 31337))
 
 #r.send("-e".encode())     # Encryption of the secret message
 #x = r.recv(1024).decode()
+
+#st, iv, val = oracle(1)
+#print(st)
 #r.send("-e".encode())
 #y = r.recv(1024).decode()
 
