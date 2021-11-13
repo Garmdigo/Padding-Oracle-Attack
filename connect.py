@@ -72,8 +72,10 @@ def sliceBlock(message):
        x += 32
        y += 32
     if(v!=0):
+      padding = 32 - (size % 32) 
+      for i in range(padding):
+	 message = message + '0'
       slices.append(message[x:y])
-
     return slices
 
 def xor(arg1,arg2):
@@ -102,7 +104,7 @@ def LastNbyte(bytes,getNtoLast,choosebyte):
     return LastBlock[-choosebyte:]
 
 def testOracle():
-     t = requestServer('')
+     t = requestServer("")
      Ciphertext, IV = GetInfo(t)
      d = sliceBlock(Ciphertext)
      b=d[0]
@@ -110,6 +112,18 @@ def testOracle():
      st = listToString(d)
      z = checkValidate(str(st), str(IV))
      return st, IV, z
+
+
+def oracle(p):
+     t = requestServer("")
+     Ciphertext, IV = GetInfo(t)
+     d = sliceBlock(Ciphertext)
+     b=d[p]
+     d[-1]=b
+     st = listToString(d)
+     z = checkValidate(str(st), str(IV))
+     return st, IV, z
+
 
 def prefixTest(C, Cprime):
     B = sliceBlock(Cprime)
@@ -124,46 +138,104 @@ def returnithBlock(ciphertext, i):
    b = blocks[i]
    return b
 
-def validDecrypt():
-    st, IV, z = testOracle()
-    if(z == "Valid"):
-	return st, IV, z
-    else:
-        while(z!="Valid"):
-           st, IV, z = testOracle()
-           if(z == "Valid"):
-                  block2 = returnithBlock(st, -2)
-                  result = xor(IV, block2)
-                  result2 = xor(result[-2:], '15')
-                  test = requestService("")
-                  newCT, newIV = GetInfo(test)
-                  print(st)
-                  print(IV)
-                  print(block2)
-                  print(result)
-                  print(result2)
-	          y = requestServer("00000000")
-                  C, I = GetInfo(y)
-                  B = prefixTest(st,C)
-                  val = checkValidate(str(B), str(IV))
-                  if(val == "Valid"):
-			print("WE'RE Close")
-                        return B, IV, val
-                  else:
-                    while(val!="Valid"):
-                      y = requestServer("00000000")
-                      C, I = GetInfo(y)
-                      B = prefixTest(st,C)
-                      val = checkValidate(str(B), str(IV))
-                      if(val == "Valid"):
-                        print("WE'RE Closer")
-                        #block = returnithBlock(B,0)
-                        block2 = returnithBlock(st, -2)
-                        result = xor(I, block2)
-                        result2 = xor(result[-2:], '15')
-                        return B, IV, val, result2
+def xorTest(val, val2):
+    result = xor(val, val2)
+    result1 = xor(result[-2:], '15')
+    return result1
 
-              
+
+def pleaseWork():
+	CT, IV, val = testOracle()
+        x = block =result=result2 = y = ""
+        if(val == "Valid"):
+                block = returnithBlock(CT, -2)
+                result = xor(IV, block)
+                result2 = xor(result[-2:], '0F')
+                x = CT
+                y = IV
+        else:
+                while(val!="Valid"):
+                        CT, IV, val = testOracle()
+                        if(val == "Valid"):
+                                block = returnithBlock(CT, -2)
+                                result = xor(IV, block)
+                                result2 = xor(result[-2:], '0F')
+                                x = CT
+                                y = IV
+        print(x)
+        print(y)
+        print(result2)
+        blocks = splitBlocks(x)
+        blockLen = len(blocks)
+        for i in range(blockLen - 2):
+		CT, IV, val = testOracle()
+        	
+        	if(val == "Valid"):
+                	block = returnithBlock(CT, -2)
+                	result = xor(IV, block)
+                	result2 = xor(result[-2:], '0F')
+                	x = CT
+                	y = IV
+        	else:
+                	while(val!="Valid"):
+                        	CT, IV, val = testOracle()
+                        	if(val == "Valid"):
+                                	block = returnithBlock(CT, -2)
+                                	result = xor(IV, block)
+                                	result2 = xor(result[-2:], '0F')
+                                	x = CT
+                                	y = IV
+		       
+		
+		
+
+'''
+def validDecrypt(prefix):
+    t = requestServer('')
+    cipher, iv = GetInfo(t)
+    cipherBlock = sliceBlock(cipher)
+    cipherLen = len(CipherBlock)
+    for i in range(cipherLen - 2):
+    	st, IV, z = testOracle(i,t)
+    	if(z == "Valid"):
+		return st, IV, z
+    	else:
+        	while(z!="Valid"):
+		 	t = requestServer('')
+    			cipher, iv = GetInfo(t)
+           		st, IV, z = testOracle(i,t)
+           		if(z == "Valid"):
+                 		block2 = returnithBlock(st, -2)
+                  		result = xor(IV, block2)
+                  		result2 = xor(result[-2:], '0F')
+                  		print(result2)
+	          		y = requestServer(prefix)
+                  		C, I = GetInfo(y)
+                  		B = prefixTest(st,C)
+                  		val = checkValidate(str(B), str(IV))
+                  		if(val == "Valid"):
+					print("WE'RE Close")
+                        		block2 = returnithBlock(st, -2)
+                        		result = xor(I, block2)
+                        		return B, IV, val, result2
+                  		else:
+                    			while(val!="Valid"):
+                      			y = requestServer(prefix)
+                      			C, I = GetInfo(y)
+                      			B = prefixTest(st,C)
+                      			val = checkValidate(str(B), str(IV))
+                      			if(val == "Valid"):
+                        			print("WE'RE Closer")
+                        			#block = returnithBlock(B,0)
+                        			block2 = returnithBlock(st, -2)
+                        			print(st)
+                        			print(block2)
+                        			print(I)
+                        			result = xor(I, block2)
+                        			print(xor(result[-2:], '0F'))
+                        			return B, IV, val, result
+
+'''             
 	         
 
 
@@ -180,51 +252,9 @@ r.connect(("128.186.120.191", 31337))
 #r.send("-e".encode())
 #y = r.recv(1024).decode()
 
-x = requestServer('')
-Ciphertext, IV = GetInfo(x)
-y = requestServer('00000000')
-CT2, IV2 = GetInfo(y)
-#B = prefixTest(Ciphertext, CT2)
-#print(Ciphertext)
-#print(CT2)
-#print(B)
+pleaseWork()
+		
 
-#d = sliceBlock(Ciphertext)
-#b=d[0]
-#d[-1]=b
-#a= d[-1]
-#c = xor(d[0], IV)
-#print(c)
-#st = listToString(d)
-#CT, IV3, val = testOracle()
-CT, IV3, val, hexval = validDecrypt()
-#block = returnithBlock(CT,0)
-#block2 = returnithBlock(Ciphertext, -2)
-#result = xor(IV2, block2)
-#result2 = xor(result[-2:], '15')
-print(CT)
-print(IV3)
-print(val)
-print(hexval)
-#print(result)
-#print(result2)
-#print(IV3)
-#print(val)
-#y = requestServer("00000000")
-#C, I = GetInfo(y)
-#print(C,I)
-
-#print(str[0])
-#u = str.decode()
-#nIV = IV.encode()
-#print(type(nIV))
-#z = checkValidate(str(st), str(IV))
-#print(z)
-#print(a[-2])
-#print(d)
-#print(IV)
-#print(Ciphertext)
-#print(type(c))
 
 #r.send("-e abcdef0123456789".encode()) # Encryption of abcdef0123456789 || message
 #x = r.recv(1024).decode()
