@@ -46,6 +46,7 @@ def requestServer(prefix):
     r.send(("-e " + str(prefix)).encode())     # Encryption of the secret message
     x = r.recv(1024).decode()
     return x
+
 def checkValidate(Ciphertext, IV):
     r.send(("-V " + str(Ciphertext) + " " + str(IV)).encode())     # Encryption of the secret message
     x = r.recv(1024).decode()
@@ -56,6 +57,7 @@ def listToString(input):
     for i in range(len(input)):
        str = str + input[i]
     return str
+
 def L2L2string(input):
 	tmp = convertToList(input)
 	return listToString(tmp)
@@ -70,8 +72,8 @@ def convertToList(input):
             lists.append(i)
     return lists
 
-def testOracle():
-     t = requestServer("")
+def testOracle(prefix=""):
+     t = requestServer(prefix)
      Ciphertext, IV = GetInfo(t)
      d = sliceBlock(Ciphertext)
      b=d[0]
@@ -124,8 +126,29 @@ def returnithBlock(ciphertext, i):
    b = blocks[i]
    return b
 
+def testLength():
+	padding = ""
+        counter = 0
+	for i in range(0, 15):
+              val="Invalid"
+              while(counter!=256):
+              	    CT2, I2, val=testOracle(padding)
+              	    if (val=='Valid'):
+                         block=returnithBlock(CT2, -2)
+                         bl=I2+CT2
+                         o=sliceBlock(bl)
+                         result=xor(o[0], block)
+                         result2=xor(result[-2:], '0F')
+			 return CT2, I2, val, padding, i
+		    counter = counter + 1
+              padding=padding+'00'
+	      print(padding)
+              counter = 0
+	
+
 def pleaseWork():
-	CT, I, val = testOracle()
+	CT, I, val, pad, padlen = testLength()
+	#(if padlen == 0)
 	s = sliceBlock(CT)
 	messagelen = len(s) -2
 	message=[]
@@ -133,7 +156,7 @@ def pleaseWork():
 		message.append([])
         x1= y1=x = block =result=result2 = y = ""
         for i in range(messagelen):
-		CT,I, val = oracle(i)
+		CT,I, val = oracle(i,pad)
         	if(val == "Valid"):
                 	block = returnithBlock(CT, -2)
 			bl = I + CT
@@ -145,7 +168,7 @@ def pleaseWork():
 			message[i].insert(0,result2.decode('hex'))
        		else:
                		while(val!="Valid"):
-                       		CT, I, val = oracle(i)
+                       		CT, I, val = oracle(i,pad)
                        		if(val == "Valid"):
                                		block = returnithBlock(CT, -2)	
 					bl = I + CT
@@ -156,9 +179,10 @@ def pleaseWork():
                                		y1 = I
 					message[i].insert(0,result2.decode('hex'))
 					
-	padding='00'	
+	padding=pad
+	count = 16 - padlen	
 	for j in range(messagelen):
-		for i in range(0, 15):
+		for i in range(0, count):
 			val="Invalid"
 			while(val!="Valid"):
 				CT2, I2, val=secondOracle(j, padding, CT, I)
@@ -170,15 +194,17 @@ def pleaseWork():
 					result2=xor(result[-2:], '0F')
 					message[j].insert(0,result2.decode('hex'))
 			padding=padding+'00'
-		padding='00'	
+		padding=pad	
 			 				
 	return(L2L2string(message))
 		
 
 
 r = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-r.connect(("128.186.120.191", 31337))
+r.connect(("128.186.120.191", 31336))
 print(pleaseWork())
-		
 
+#CT, I, val, pad, z = testLength()		
+#print(pad)
+#print(z)
 
