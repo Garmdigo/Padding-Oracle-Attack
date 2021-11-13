@@ -68,8 +68,11 @@ def convertToList(input):
         if type(i) is list:
             for j in i:
                 lists.append(j)
+		
         else:
             lists.append(i)
+	    
+    lists.pop()
     return lists
 
 def testOracle(prefix=""):
@@ -131,7 +134,7 @@ def testLength():
         counter = 0
 	for i in range(0, 15):
               val="Invalid"
-              while(counter!=256):
+              while(counter!=257):
               	    CT2, I2, val=testOracle(padding)
               	    if (val=='Valid'):
                          block=returnithBlock(CT2, -2)
@@ -193,9 +196,10 @@ def pleaseWork():
 					result=xor(o[j], block)
 					result2=xor(result[-2:], '0F')
 					message[j].insert(0,result2.decode('hex'))
+					#print(result2.decode('hex'))
 			padding=padding+'00'
 		padding=pad	
-			 				
+		 				
 	return(L2L2string(message))
 		
 
