@@ -145,12 +145,17 @@ def testLength():
 			 return CT2, I2, val, padding, i
 		    counter = counter + 1
               padding=padding+'00'
-	      print(padding)
               counter = 0
 	
 
 def pleaseWork():
-	CT, I, val, pad, padlen = testLength()
+	probability_limiter = True 
+	while(probability_limiter):
+		try:
+			CT, I, val, pad, padlen = testLength()
+			probability_limiter = False
+		except:
+			pass
 	#(if padlen == 0)
 	s = sliceBlock(CT)
 	messagelen = len(s) -2
@@ -211,4 +216,3 @@ print(pleaseWork())
 #CT, I, val, pad, z = testLength()		
 #print(pad)
 #print(z)
-
