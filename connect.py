@@ -1,3 +1,4 @@
+
 import socket
 from binascii import unhexlify, hexlify
 import base64
@@ -11,14 +12,6 @@ def GetInfo(Cipher):
     CipherText = C[0].replace(" ","")
     IV = iv[1].replace("'","")
     return CipherText,IV
-
-def splitBlocks(message):
-    Size = len(message)
-    Slices = []
-    Increment =int(Size/32)
-    for i in range(Increment):
-	Slices.append(message[i*32:(i+1)*32])
-    return Slices
 
 
 def sliceBlock(message):
@@ -156,7 +149,7 @@ def pleaseWork():
 			probability_limiter = False
 		except:
 			pass
-	#(if padlen == 0)
+	
 	s = sliceBlock(CT)
 	messagelen = len(s) -2
 	message=[]
@@ -201,7 +194,7 @@ def pleaseWork():
 					result=xor(o[j], block)
 					result2=xor(result[-2:], '0F')
 					message[j].insert(0,result2.decode('hex'))
-					#print(result2.decode('hex'))
+					
 			padding=padding+'00'
 		padding=pad	
 		 				
@@ -210,9 +203,5 @@ def pleaseWork():
 
 
 r = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-r.connect(("128.186.120.191", 31336))
+r.connect(("128.186.120.191", 31337))
 print(pleaseWork())
-
-#CT, I, val, pad, z = testLength()		
-#print(pad)
-#print(z)
